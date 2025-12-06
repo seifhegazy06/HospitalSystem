@@ -63,6 +63,8 @@ public class HospitalSystem {
 	public ArrayList<String> getBookedAppointments(int doctorID) {}
 	public ArrayList<String> getAvailableAppointments(int doctorID) {}
 	
+	
+	
 	private Doctor findDoctor(int doctorID) {
 		for (Doctor doctor : doctors) {
 			if (doctor.getID() == doctorID)
