@@ -1,6 +1,6 @@
 package hospitalSystem;
 
-public enum roomNum {
+public enum RoomNum {
 
     A1,
     B1,
