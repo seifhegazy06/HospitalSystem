@@ -27,8 +27,12 @@ public class Doctor extends Person {
         return availableTimes;
     }
 
-    public void addAvailableTime(String time){
-        availableTimes.add(time);
+    public void addAvailableTime(String timeSlot){
+        availableTimes.add(timeSlot);
+    }
+
+    public void deleteAvailableTimeSlot(String timeSlot){
+        availableTimes.remove(timeSlot);
     }
 
     public void setRoomNum(RoomNum roomNum) {

@@ -2,80 +2,203 @@ package hospitalSystem;
 import java.util.ArrayList;
 
 public class HospitalSystem {
-	private ArrayList<Doctor> doctors = new ArrayList<Doctor>();
-	private ArrayList<Patient> patients = new ArrayList<Patient>();
-	private ArrayList<Appointments> appointments = new ArrayList<Appointments>();
+	private ArrayList<Doctor> doctors = new ArrayList<>();
+	private ArrayList<Patient> patients = new ArrayList<>();
+	private ArrayList<Appointment> appointments = new ArrayList<>();
 	
-	public HospitalSystem() {
-		
+	public HospitalSystem() {}
+	
+	public static String wrapDateTimeString(String date, String time){
+		return date + ", " + time;
 	}
-	
-	
-	
-	public void addDoctor(String name, int ID, String email, String phoneNumber,
+
+	public int addDoctor(String name, int ID, String email, int phoneNumber,
 						DoctorSpecialization specialization, ArrayList<String> availableTime, RoomNum roomNum) {
-		
-		Doctor doctor = new Docotor(name, ID, email, phoneNumber, specialization, availableTime, roomNum);
-				
+		Doctor doctor = findDoctor(ID);
+		if (doctor != null){
+			System.out.println("The doctor already exists\n=================================================");
+			doctor.display();
+			System.out.println("=================================================");
+			return -1;
+		}
+
+		doctor = new Doctor(ID, name, email, phoneNumber, specialization, roomNum);
 		doctors.add(doctor);
+
+		System.out.println("The patient is added successfully");
+
+		return 0;
 		
 	}
 	
-	public void editDoctor(int ID, String email, String phoneNumber, DoctorSpecialization specialization, RoomNum roomNum) {
+	public int editDoctor(int ID, String email, int phoneNumber, DoctorSpecialization specialization, RoomNum roomNum) {
 		Doctor doctor = findDoctor(ID);
 		
 		if (doctor == null)
-			return;
-	
+			return -1;
+
 		doctor.setEmail(email);
 		doctor.setPhoneNumber(phoneNumber);
 		doctor.setSpecialization(specialization);
 		doctor.setRoomNum(roomNum);
+
+
+		return 0;
 	
 	}
 	
-	public void addPatient(int ID, String name, String email, int phoneNumber, int medicalHistoryID) {
+	public int addPatient(int ID, String name, String email, int phoneNumber, int medicalHistoryID) {
 
-		Patient patient = new Patient (ID, name, email, phoneNumber, medicalHistoryID);
+		Patient patient = findPatient(ID);
+		if (patient != null){
+			System.out.println("The Patien already exists\n=================================================");
+			patient.display();
+			System.out.println("=================================================");
+			return -1;
+		}
 			
+		patient = new Patient (ID, name, email, phoneNumber, medicalHistoryID);
 		patients.add(patient);
+
+		
+		System.out.println("the patient is added successfully");
+
+		return 0;
 		
 	}
 	
-	public void editPatient(int patientID, String email, int phoneNumber) {
+	public int editPatient(int patientID, String email, int phoneNumber) {
 		Patient patient = findPatient(patientID);
 		if (patient == null)
-			return;
+			return -1;
 		
 		patient.setEmail(email);
 		patient.setPhoneNumber(phoneNumber);
-	}
-	
-	public void addAvailableSlot(int doctorID, String date, String time) {
-		Doctor doctor = findDoctor(doctorID);
-		
-		if (doctor == null)
-			return;
 
-		// ADD time to doctor object according to the format needed
-		
+		return 0;
 	}
 	
+	public int addAvailableSlot(int doctorID, String date, String time) {
+		Doctor doctor = findDoctor(doctorID);
+		if (doctor == null)
+			return -1;
+
+		String timeSlot = wrapDateTimeString(date, time);
+
+		for (String availableTime : doctor.getAvailableTimes()){
+			if (availableTime.equals(timeSlot)){
+				System.out.println("This time slot is already exists in the doctor's available time");
+				return -1;
+			}
+		}
+		
+		doctor.addAvailableTime(timeSlot);
+		System.out.println(timeSlot + " is successfully added to the doctors available times");
+		return 0;
+	}
 	
-	// to be implemented when the Doctor and Appointment Classes are pushed to the repo
-	public void bookAppointment() {}
-	public void cancelAppointment() {}
-	public ArrayList<String> getBookedAppointments(int doctorID) {}
-	public ArrayList<String> getAvailableAppointments(int doctorID) {}
+	public int bookAppointment(int doctorID, int patientMedicalHistoryID, String date, String time) {
+			if(isThereAppointmet(doctorID, patientMedicalHistoryID))
+				return -1;
+
+			Doctor doctor = findDoctor(doctorID);
+			for (String availableSlot : doctor.getAvailableTimes()){
+				if (availableSlot.equals(wrapDateTimeString(date, time))){
+					Appointment appointment = new Appointment(doctorID, patientMedicalHistoryID, date, time);
+
+					appointments.add(appointment);
+					
+					doctor.deleteAvailableTimeSlot(wrapDateTimeString(date, time));
+
+					System.out.println("Appointment is booked successfully at " + wrapDateTimeString(date, time));
+					return 0;
+				}
+			}
+			System.out.println("Doctor is not availabel at " + wrapDateTimeString(date, time) + ", make sure of doctor available time slots.");
+			return -1;
+		}
+
+	public int cancelAppointment(int doctorID, int patientMedicalHistoryID, String date, String time) {
+		for (Appointment appointment : appointments){
+			if (appointment.getDoctorID() == doctorID && appointment.getPatientMedicalHistoryID() == patientMedicalHistoryID &&
+				appointment.getDate() == date && appointment.getTime() == time){
+
+				appointments.remove(appointment);
+				
+				addAvailableSlot(doctorID, date, time);
+
+				System.out.println("The Appointment is successfully cancelled");
+
+				return 0;
+			}
+		}
+		System.out.println("There is no such appointment between the patient and the doctor at " + wrapDateTimeString(date, time));
+		return -1;
+	}
 	
+	public ArrayList<String> getBookedAppointments() {
+		ArrayList<String> bookedAppointments = new ArrayList<>();
+		
+		for (Appointment appointment : appointments) {
+			if (!appointment.isDone()){
+				bookedAppointments.add(appointment.getAppointment());
+				appointment.display();
+			}
+		}
+		return bookedAppointments;
+	}
+
+	public ArrayList<String> getBookedAppointments(int doctorID) {
+		ArrayList<String> bookedAppointments = new ArrayList<>();
+		
+		for (Appointment appointment : appointments) {
+			if (appointment.getDoctorID() == doctorID && !appointment.isDone()){
+				bookedAppointments.add(appointment.getAppointment());
+				appointment.display();
+			}
+		}
+		return bookedAppointments;
+	}
 	
-	
+	public ArrayList<String> getAvailableAppointments() {
+		ArrayList<String> availableAppointments = new ArrayList<>();
+		
+		for (Appointment appointment : appointments) {
+			if (!appointment.isDone() && appointment.isAvailable()){
+				availableAppointments.add(appointment.getAppointment());
+				appointment.display();
+			}
+		}
+		return availableAppointments;
+	}
+
+	public ArrayList<String> getAvailableAppointments(int doctorID) {
+		ArrayList<String> availableAppointments = new ArrayList<>();
+		
+		for (Appointment appointment : appointments) {
+			if (appointment.getDoctorID() == doctorID && !appointment.isDone() && appointment.isAvailable()){
+				availableAppointments.add(appointment.getAppointment());
+				appointment.display();
+			}
+		}
+		return availableAppointments;
+	}
+
+	public void doneAppointment(int doctorID, int patientMedicalHistoryID, String date, String time){
+		for (Appointment appointment : appointments) {
+			if (appointment.getDoctorID() == doctorID && appointment.getPatientMedicalHistoryID()==patientMedicalHistoryID &&
+			appointment.getDate() == date && appointment.getTime() == time){
+				appointment.markAsDone();
+			}
+		}
+	}
+
 	private Doctor findDoctor(int doctorID) {
 		for (Doctor doctor : doctors) {
 			if (doctor.getID() == doctorID)
 				return doctor;
 		}
-		System.out.println("!Warning: Doctor of entered ID is not found, double check its ID or add the doctor to the system first.");
+		System.out.println("Doctor of entered ID is not found");
 		return null;
 	}
 	
@@ -84,7 +207,18 @@ public class HospitalSystem {
 			if (patient.getID() == patientID)
 				return patient;
 		}
-		System.out.println("!Warning: patient of entered ID is not found, double check its ID or add the patient to the system first.");
+		System.out.println("patient of entered ID is not found");
 		return null;
+	}
+
+	private boolean isThereAppointmet(int doctorID, int patientMedicalHistoryID){
+		for (Appointment appointment : appointments){
+			if (appointment.getDoctorID() == doctorID && appointment.getPatientMedicalHistoryID() == patientMedicalHistoryID && !appointment.isDone()){
+				System.out.println("There is already an incoming appointment for the patient with the same doctor at "
+					+ wrapDateTimeString(appointment.getDate(), appointment.getTime()));
+					return true;
+				}
+			}
+			return false;
 	}
 }
