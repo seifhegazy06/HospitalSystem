@@ -4,42 +4,59 @@ import java.util.ArrayList;
 
 public class Doctor extends Person {
 
-    ArrayList<String> availableTimes ;
+    ArrayList<String> availableTimes = new ArrayList<>();
 
     DoctorSpecialization  specialization;
-    roomNum roomNumber;
+    RoomNum roomNumber;
+
+    public Doctor(int ID, String name, String email, int phoneNumber, DoctorSpecialization doctorSpecialization, RoomNum roomNumber){
+        super(ID, name, email, phoneNumber);
+        setSpecialization(doctorSpecialization);
+        setRoomNum(roomNumber);
+    }
 
     public void setSpecialization(DoctorSpecialization specialization) {
         this.specialization = specialization;
     }
 
-    public DoctorSpecialization  getSpecialization() {
+    public DoctorSpecialization getSpecialization() {
         return specialization;
     }
-
 
     public ArrayList<String> getAvailableTimes() {
         return availableTimes;
     }
 
-    public void setRoomNum(roomNum roomNum) {
-        this.roomNumber = roomNum;
-
+    public void addAvailableTime(String time){
+        availableTimes.add(time);
     }
 
-    public roomNum getRoomNumber() {
+    public void setRoomNum(RoomNum roomNum) {
+        this.roomNumber = roomNum;
+    }
+
+    public RoomNum getRoomNumber() {
         return roomNumber;
     }
 
     @Override
     public void display(){
-        System.out.println("Name: " + getname());
+        System.out.println("Name: " + getName());
         System.out.println("ID: " + getID());
         System.out.println("Email: " + getEmail());
         System.out.println("Phone Number: " + getPhoneNumber());
-        System.out.println("Specialization: " + this.specialization);
-        System.out.println("Room Number: " + this.roomNumber);
+        System.out.println("Specialization: " + getSpecialization());
+        System.out.println("Room Number: " + getRoomNumber());
+        System.out.print("Available Times :");
+        for(String time : availableTimes){
+            System.out.print(" " + time);
+        }
+        System.out.println(" ");
+    }
 
+    @Override
+    public String toString(){
+        return getName() + ", " + getID() + ", " + getEmail() + ", " + getPhoneNumber() + ", " + getRoomNumber() + ", " + getSpecialization();
     }
 
 }

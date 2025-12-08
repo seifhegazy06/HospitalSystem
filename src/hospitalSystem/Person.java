@@ -9,15 +9,15 @@ public abstract class Person {
     public Person(int ID, String name, String email, int phoneNumber){
         this.ID = ID;
         this.name = name;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
+        setEmail(email);
+        setPhoneNumber(phoneNumber);
     }
 
     public void display(){
-        System.out.println("Name: " + this.name);
-        System.out.println("ID: " + this.ID);
-        System.out.println("Email: " + this.email);
-        System.out.println("Phone Number: " + this.phoneNumber);
+        System.out.println("Name: " + getName());
+        System.out.println("ID: " + getID());
+        System.out.println("Email: " + getEmail());
+        System.out.println("Phone Number: " + getPhoneNumber());
 
     }
 
@@ -27,7 +27,7 @@ public abstract class Person {
     }
 
     public int getID(){ return ID; }
-    public String getname(){ return name; }
+    public String getName(){ return name; }
     public String getEmail(){ return email; }
     public int getPhoneNumber(){ return phoneNumber; }
     public void setPhoneNumber(int phoneNumber){ this.phoneNumber = phoneNumber; }

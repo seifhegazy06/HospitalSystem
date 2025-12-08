@@ -1,7 +1,6 @@
 package hospitalSystem;
 
 public enum RoomNum {
-
     A1,
     B1,
     C1,
