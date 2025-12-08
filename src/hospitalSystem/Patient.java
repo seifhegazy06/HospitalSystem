@@ -19,7 +19,7 @@ public class Patient extends Person {
 
     @Override
     public String toString(){
-        return getName() + ", " + getID() + ", " + getEmail() + ", " + getPhoneNumber();
+        return getName() + ", " + getID() + ", " + getEmail() + ", " + getPhoneNumber() + ", " + getMedicalHistoryID();
     }
 
     public void setMedicalHistoryID(int medicalHistoryID){

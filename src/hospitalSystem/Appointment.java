@@ -62,7 +62,7 @@ public class Appointment {
 	}
 
 	public boolean isDone(){
-		return isDone;
+		return this.isDone;
 	}
 
 	public void display(){
@@ -76,7 +76,4 @@ public class Appointment {
 		System.out.println("===================================================");
 	}
 
-	public String getAppointment(){
-		return"Doctor ID: " + getDoctorID() + "| " + HospitalSystem.wrapDateTimeString(date, time);
-	}
 }
